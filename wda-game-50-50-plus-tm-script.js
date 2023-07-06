@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Webcamdarts Game 50/50 [plus]
-// @version      2.6
+// @version      2.7
 // @description  To see your and opponent webcams in 50/50 mode. No more needs Webcamdarts Dual view for Joiner.Record Stream and auto-switch button
 // @author       Edmund Kawalec
 // @match        https://game.webcamdarts.com/game
@@ -2217,14 +2217,16 @@ document.querySelector('#btn-start-recording2').onclick = function (){
 
 // voice: points left
 var voiceCfg = new MonkeyConfig({
-    title: 'Voice configuration',
+    title: 'Marker voice settings',
     menuCommand: true,
     params: {
         voiceEnable: {
+            'label': 'Voice enable',
             type: 'checkbox',
             default: true
         },
         voiceLanguage: {
+            'label': 'Language',
             type: 'select',
             choices: [ 'Polski', 'English', 'Deutsch' ],
             default: 'English'
@@ -2329,7 +2331,7 @@ function checkScoresLeft() {
 $(document).on('DOMSubtreeModified', "[ng-hide='submittingScore']", function () {
     let _c = $(this).first();
     if (!_c.hasClass('ng-hide')) {
-        const myTimeout = setTimeout(checkScoresLeft, 1000);
+        const myTimeout = setTimeout(checkScoresLeft, 300);
     }
 });
 
