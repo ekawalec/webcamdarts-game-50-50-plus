@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Webcamdarts Game 50/50 [plus]
-// @version      2.8
+// @version      2.9
 // @description  To see your and opponent webcams in 50/50 mode. No more needs Webcamdarts Dual view for Joiner.Record Stream and auto-switch button
 // @author       Edmund Kawalec
 // @match        https://game.webcamdarts.com/game
@@ -14,6 +14,7 @@
 // @copyright 2023, e.kawalec
 // @run-at document-end
 // ==/UserScript==
+
 
 
 
@@ -64,6 +65,7 @@ function addGlobalStyle(css) {
     addGlobalStyle('button#hidecambtn {display:none; position:fixed;bottom: 4px ;float: right;right: 210px;}');
     addGlobalStyle('button#button_fullScreen { position:fixed;bottom: 4px ;float: right;right: 210px;}');
     addGlobalStyle('button#button_fullScreen:hover { position:fixed;bottom: 4px ;float: right;right: 210px;}');
+    addGlobalStyle('button#button_switchAvgBtn { position:fixed;bottom: 4px ;float: right;right: 300px;}');
     addGlobalStyle('#myvideo{position:relative; float:none;left:0px;height:auto;width:50%;}');
     addGlobalStyle('#remotevideo {position:relative; float:none; right:0px; height:auto;}');
     addGlobalStyle('#content > div > div > div.row.text-center.wrapper-sm > div:nth-child(1) > div:nth-child(3) > div:nth-child(2){width: 50%;top: 17%;position: fixed;left: 0;padding: 0;}');
@@ -147,6 +149,8 @@ function addGlobalStyle(css) {
     addGlobalStyle('#content > div > div > div.row.text-center.wrapper-sm > div:nth-child(1) > div.row.ng-scope > div > div > div:nth-child(3) > div:nth-child(1) > h3, #content > div > div > div.row.text-center.wrapper-sm > div:nth-child(1) > div.row.ng-scope > div > div > div:nth-child(3) > div:nth-child(2) > h3{background:#FFF;font-size:0.8em;}');
 })();
 
+
+
 ////////////switchcamera/////////////////////
 // add button for switch
 var button_switchCam = document.createElement('div');
@@ -200,6 +204,42 @@ function positionRemoteVideo(id) {
     if (document.getElementById(id).style.width == '100vh') document.getElementById(id).style.width = ''; else document.getElementById(id).style.width = '100vh'
 
 }
+
+
+
+
+////////////hide AVG's/////////////////////
+// add button for hide players avg
+var button_switchAvg = document.createElement('div');
+button_switchAvg.innerHTML = '<button id="button_switchAvgBtn" class="btn btn-primary" type="button">Hide AVG</button>';
+var positionWrapper = document.querySelector('.wrapper-sm');
+positionWrapper.before(button_switchAvg);
+var avgViewState = true;
+var saveStateAvgs = document.getElementById('button_switchAvgBtn').addEventListener('click', function (poswitch) {
+    if (avgViewState === true) {
+        $('#content > div > div > div.row.text-center.wrapper-sm > div:nth-child(1) > div.row.ng-scope > div > div:nth-child(1) > div:nth-child(1) > div:nth-child(2) > div.col-xs-7.col-sm-7.col-md-7.col-lg-7 > div:nth-child(6)').hide();
+        $('#content > div > div > div.row.text-center.wrapper-sm > div:nth-child(1) > div.row.ng-scope > div > div:nth-child(1) > div.col-xs-2.col-sm-2.col-md-2.col-lg-2 > div > div:nth-child(10)').hide();
+        $('#content > div > div > div.row.text-center.wrapper-sm > div:nth-child(1) > div.row.ng-scope > div > div:nth-child(1) > div.col-xs-5.col-sm-5.col-md-5.col-lg-5.active-player > div:nth-child(2) > div.col-xs-7.col-sm-7.col-md-7.col-lg-7 > div:nth-child(6)').hide();
+        $('#content > div > div > div.row.text-center.wrapper-sm > div:nth-child(1) > div.row.ng-scope > div > div:nth-child(1) > div.col-xs-5.col-sm-5.col-md-5.col-lg-5.bg-black.dker > div:nth-child(2) > div.col-xs-7.col-sm-7.col-md-7.col-lg-7.bg-black.dker > div:nth-child(6)').hide();
+        avgViewState = false;
+        $('#button_switchAvgBtn').text('Show AVG');
+    } else {
+        $('#content > div > div > div.row.text-center.wrapper-sm > div:nth-child(1) > div.row.ng-scope > div > div:nth-child(1) > div:nth-child(1) > div:nth-child(2) > div.col-xs-7.col-sm-7.col-md-7.col-lg-7 > div:nth-child(6)').show();
+        $('#content > div > div > div.row.text-center.wrapper-sm > div:nth-child(1) > div.row.ng-scope > div > div:nth-child(1) > div.col-xs-2.col-sm-2.col-md-2.col-lg-2 > div > div:nth-child(10)').show();
+        $('#content > div > div > div.row.text-center.wrapper-sm > div:nth-child(1) > div.row.ng-scope > div > div:nth-child(1) > div.col-xs-5.col-sm-5.col-md-5.col-lg-5.active-player > div:nth-child(2) > div.col-xs-7.col-sm-7.col-md-7.col-lg-7 > div:nth-child(6)').show();
+        $('#content > div > div > div.row.text-center.wrapper-sm > div:nth-child(1) > div.row.ng-scope > div > div:nth-child(1) > div.col-xs-5.col-sm-5.col-md-5.col-lg-5.bg-black.dker > div:nth-child(2) > div.col-xs-7.col-sm-7.col-md-7.col-lg-7.bg-black.dker > div:nth-child(6)').show();
+        avgViewState = true;
+        $('#button_switchAvgBtn').text('Hide AVG');
+    }
+});
+
+
+
+
+
+
+
+
 // add button for full
 var button_fullScreen = document.createElement('div');
 button_fullScreen.innerHTML = '<button id="button_fullScreen" class="btn btn-primary" type="button_fullScreen">Fullscreen</button>';
@@ -445,4 +485,6 @@ $(document).on('DOMSubtreeModified', "[ng-hide='submittingScore']", function () 
         const myTimeout = setTimeout(checkScoresLeft, 300);
     }
 });
+
+
 
