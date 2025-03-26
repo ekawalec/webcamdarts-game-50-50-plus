@@ -1,7 +1,8 @@
 // ==UserScript==
 // @name         Webcamdarts Game 50/50 [plus]
-// @version      2.9
-// @description  To see your and opponent webcams in 50/50 mode. No more needs Webcamdarts Dual view for Joiner.Record Stream and auto-switch button
+// @version      2.10
+// @description  Webcamdarts Game view splitted in 50/50 mode. Player can switch cameras side, hide AVG, use Marker voice  
+// @description:pl  Widok Gry w WebcamDarts podzielony w trybie 50/50. Gracz może zmienić stronę kamery, ukryć AVG, użyć głosu Markera
 // @author       Edmund Kawalec
 // @match        https://game.webcamdarts.com/game
 // @grant        GM_registerMenuCommand
@@ -58,9 +59,9 @@ function addGlobalStyle(css) {
     addGlobalStyle('#content > div > div > div.row.text-center.wrapper-sm > div:nth-child(1) > div.row.ng-scope > div > div:nth-child(1) > div.col-xs-5.col-sm-5.col-md-5.col-lg-5.bg-black.dker > div:nth-child(1) > div > div.h1.font-bold.text-scores > span {z-index: 2;position: relative;}');
     addGlobalStyle('#content > div > div > div > div:nth-child(1) > div.row.ng-scope > div > div:nth-child(1) > div.col-xs-5.col-sm-5.col-md-5.col-lg-5.active-player,#content > div > div > div.row.text-center.wrapper-sm > div:nth-child(1) > div.row.ng-scope > div > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div{padding:0;float:left;display: block;position: relative;}');
     addGlobalStyle('#content > div > div > div.row.text-center.wrapper-sm > div:nth-child(1) > div.row.ng-scope > div > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div > div > div.h1.font-bold.text-scores{background: #131e26;}');
-    addGlobalStyle('{    background: #131e26;}');
+
     addGlobalStyle('#error-container > div {width: 30%;left: 35%;position: relative;}');
-    addGlobalStyle('.btn {     font-size: 12px;    padding: 5px;}');
+    addGlobalStyle('.btn {font-size: 12px;    padding: 5px; z-index: 99;}');
     addGlobalStyle('button#switchbtn { position:fixed;bottom: 4px ;float: right;right: 120px;}');
     addGlobalStyle('button#hidecambtn {display:none; position:fixed;bottom: 4px ;float: right;right: 210px;}');
     addGlobalStyle('button#button_fullScreen { position:fixed;bottom: 4px ;float: right;right: 210px;}');
@@ -149,7 +150,15 @@ function addGlobalStyle(css) {
     addGlobalStyle('#content > div > div > div.row.text-center.wrapper-sm > div:nth-child(1) > div.row.ng-scope > div > div > div:nth-child(3) > div:nth-child(1) > h3, #content > div > div > div.row.text-center.wrapper-sm > div:nth-child(1) > div.row.ng-scope > div > div > div:nth-child(3) > div:nth-child(2) > h3{background:#FFF;font-size:0.8em;}');
 })();
 
+////////cancel game button fix z-index/////////////
 
+setTimeout(function() {
+    var cancelButton = $("button:contains('Cancel Game')");
+    cancelButton.css('position', 'fixed');
+    cancelButton.css('right', '2px');
+    cancelButton.css('bottom', '4px');
+    cancelButton.css('z-index', '99');
+}, 3000);
 
 ////////////switchcamera/////////////////////
 // add button for switch
@@ -439,7 +448,7 @@ function say(m) { // language 3 en
         speechSynthesis.cancel();
         var msg = new SpeechSynthesisUtterance();
         var voices = window.speechSynthesis.getVoices();
-        console.log(voices);
+        //console.log(voices);
         var lang = getLang();
         msg.voice = voices[lang];
         msg.voiceURI = voices[lang].voiceURI;
@@ -454,37 +463,60 @@ function say(m) { // language 3 en
         };
 
         msg.onpause = function(e) {
-            console.log('onpause in ' + e.elapsedTime + ' seconds.');
+            //console.log('onpause in ' + e.elapsedTime + ' seconds.');
         }
 
         msg.onend = function(e) {
-            console.log('onend in ' + e.elapsedTime + ' seconds.');
+            //console.log('onend in ' + e.elapsedTime + ' seconds.');
             speechSynthesis.cancel();
         };
 
         speechSynthesis.onerror = function(e) {
-            console.log('speechSynthesis onerror in ' + e.elapsedTime + ' seconds.');
+            //console.log('speechSynthesis onerror in ' + e.elapsedTime + ' seconds.');
             speechSynthesis.cancel();
         };
         speechSynthesis.speak(msg);
     }
 }
 
+$("[ng-hide='submittingScore']").addClass('submittingScore');
+
 function checkScoresLeft() {
-    let _leftCombination = $('.active-player').find('.h3').find('span').text().trim(); // left combination
-    let _leftPoints = parseInt($(document).find('.active-player').find('.h1').find('span').text()); //
-    console.log(_leftCombination, _leftPoints);
-    if (_leftCombination.length || _leftPoints < 61) {
-        say(vCommands.scoresLeft[getLang()] +" "+ _leftPoints);
+    let _c = $(".submittingScore").first();
+    if (!_c.hasClass('ng-hide')) {
+        const myTimeout = setTimeout(function() {
+            let _leftCombination = $('.active-player').find('.h3').find('span').text().trim(); // left combination
+            let _playerName = $('.active-player').find('.h4').find('span').text().trim(); // left combination
+            let _leftPoints = parseInt($(document).find('.active-player').find('.h1').find('span').text()); //
+            console.log('left combination: ', _leftCombination, ', left points:', _leftPoints);
+            if (_leftCombination.length || _leftPoints < 61) {
+                say(_playerName +", "+ vCommands.scoresLeft[getLang()] +" "+ _leftPoints);
+            }
+        }, 300);
     }
 }
 
-$(document).on('DOMSubtreeModified', "[ng-hide='submittingScore']", function () {
-    let _c = $(this).first();
-    if (!_c.hasClass('ng-hide')) {
-        const myTimeout = setTimeout(checkScoresLeft, 300);
-    }
-});
+var scoresSelectsObserver = (window.MutationObserver) ? window.MutationObserver : window.WebKitMutationObserver;
+if (scoresSelectsObserver){
+    var scoresSelectsMonitor = new scoresSelectsObserver(function(mutationSet){
+        mutationSet.forEach(function(mutation) {
+            for (var i=0; i<mutation.addedNodes.length; i++) {
+                //console.log(mutation.addedNodes[i].nodeType);
+                console.log(mutation.addedNodes[i]);
+                if (mutation.addedNodes[i].nodeType == 1) {
+                    $("select").scrollLeft(999999);
+                    const myTimeout = setTimeout(checkScoresLeft, 300);
+                    //$(".dker div select").scrollLeft(100);
+                }
+            }
+        });
+    });
+    var opts = {childList: true, subtree: true};
+    scoresSelectsMonitor.observe(document.body, opts);
+    //scoresSelectsMonitor.observe(document.body, opts);
+}
+
+
 
 
 
