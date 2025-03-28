@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Webcamdarts Game 50/50 [plus]
-// @version      2.12
+// @version      2.13
 // @description  Webcamdarts Game view splitted in 50/50 mode. Player can switch cameras side, hide AVG, use Marker voice  
 // @description:pl  Widok Gry w WebcamDarts podzielony w trybie 50/50. Gracz może zmienić stronę kamery, ukryć AVG, użyć głosu Markera
 // @author       Edmund Kawalec
@@ -484,9 +484,9 @@ function checkScoresLeft() {
         let _leftCombination = _activePlayer.find('.h3').find('span').text().trim(); // left combination
         let _playerName = _activePlayer.find('.h4').find('span').text().trim(); // left combination
         let _leftPoints = parseInt(_activePlayer.find('.h1').find('span').text()); //
-        console.log('left combination: ', _leftCombination, ', left points:', _leftPoints);
         if (_leftCombination.length || _leftPoints < 61) {
             say(_playerName +", "+ vCommands.scoresLeft[getLang()] +" "+ _leftPoints);
+            console.log('left combination: ', _leftCombination, ', left points:', _leftPoints);
         }
     }, 300);
 }
@@ -496,12 +496,9 @@ if (scoresSelectsObserver){
     var scoresSelectsMonitor = new scoresSelectsObserver(function(mutationSet){
         mutationSet.forEach(function(mutation) {
             for (var i=0; i<mutation.addedNodes.length; i++) {
-                //console.log(mutation.addedNodes[i].nodeType);
-                //console.log(mutation.addedNodes[i]);
                 if (mutation.addedNodes[i].nodeType == 1) {
                     $("select").scrollLeft(999999);
                     const myTimeout = setTimeout(checkScoresLeft, 300);
-                    //$(".dker div select").scrollLeft(100);
                 }
             }
         });
