@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Webcamdarts Game 50/50 [plus]
-// @version      2.11
+// @version      2.12
 // @description  Webcamdarts Game view splitted in 50/50 mode. Player can switch cameras side, hide AVG, use Marker voice  
 // @description:pl  Widok Gry w WebcamDarts podzielony w trybie 50/50. Gracz może zmienić stronę kamery, ukryć AVG, użyć głosu Markera
 // @author       Edmund Kawalec
@@ -479,7 +479,7 @@ function say(m) { // language 3 en
 $("[ng-hide='submittingScore']").addClass('submittingScore');
 
 function checkScoresLeft() {
-    let _activePlayer = $('.active-player.dker');
+    let _activePlayer = $('.active-player');
     const myTimeout = setTimeout(function() {
         let _leftCombination = _activePlayer.find('.h3').find('span').text().trim(); // left combination
         let _playerName = _activePlayer.find('.h4').find('span').text().trim(); // left combination
